@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サークル参加率と男女比</title>
+    <!-- Chart.jsのCDNを読み込み -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>サークル参加率と男女比</h1>
+    <!-- グラフを表示するためのキャンバス -->
+    <canvas id="myChart" width="400" height="400"></canvas>
+
+    <!-- グラフを描画するJavaScriptコード -->
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar', // グラフのタイプ（例: bar, line, pieなど）
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月'], // X軸のラベル
+                datasets: [{
+                    label: '参加率 (%)',
+                    data: [65, 59, 80, 81, 56], // グラフに表示するデータ
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
