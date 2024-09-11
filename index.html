@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <!-- スクロール用のスタイルを追加 -->
     <style>
-        /* グラフをスクロール可能にするためのスタイル */
         .chart-container {
             width: 100%;
             overflow-x: auto; /* 横スクロールを許可 */
@@ -23,17 +22,14 @@
         canvas {
             display: inline-block; /* キャンバスをインラインブロックにする */
         }
-        /* 円グラフのサイズを小さくするためのスタイル */
         .chart-container.small-chart canvas {
             width: 300px; /* 円グラフの幅 */
             height: 300px; /* 円グラフの高さ */
         }
-        /* 棒グラフを横に大きくするためのスタイル */
         .chart-container.large-bar-chart canvas {
             width: 1500px; /* 棒グラフの幅 */
             height: 400px; /* 棒グラフの高さ */
         }
-        /* 工事中のメッセージ用スタイル */
         .under-construction {
             text-align: center; /* テキストを中央揃え */
             font-size: 3em; /* フォントサイズを大きく設定 */
@@ -43,24 +39,20 @@
     </style>
 </head>
 <body>
-    <!-- 工事中メッセージ -->
     <div class="under-construction">
         工事中
     </div>
 
     <h1>サークル参加回数</h1>
-    <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
     <div class="chart-container large-bar-chart">
         <canvas id="myChart"></canvas>
     </div>
 
-    <!-- 円グラフを表示するためのキャンバスを追加 -->
     <h2>全体の男女比</h2>
     <div class="chart-container small-chart">
         <canvas id="genderChart"></canvas>
     </div>
 
-    <!-- CSVを読み込んでグラフを描画するJavaScriptコード -->
     <script>
         // CSVファイルを読み込む関数
         function loadCSV(url, callback) {
@@ -82,7 +74,6 @@
 
         // CSVのデータを処理してグラフを描画する関数
         function processCSVData(data) {
-            // 参加回数のグラフ用データ処理
             const members = data.slice(3, 39).map(row => row[11]); // L列からメンバー名を取得（4〜39行）
             const participationCounts = members.map(() => 0); // 参加回数の配列を初期化
 
@@ -115,7 +106,6 @@
             let maleCount = 0;
             let femaleCount = 0;
 
-            // 男女のカウント
             for (let i = 3; i < data.length; i++) {
                 const gender = data[i][4]; // E列から性別を取得
                 if (gender === '男性') {
@@ -125,7 +115,6 @@
                 }
             }
 
-            // 円グラフを描画
             drawGenderChart(maleCount, femaleCount);
         }
 
@@ -142,10 +131,7 @@
                         data: data,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        barThickness: 20,
-                        barPercentage: 0.8,
-                        categoryPercentage: 0.9
+                        borderWidth: 1
                     }]
                 },
                 options: {
@@ -195,22 +181,18 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        const total = context.chart._metasets[0].data.reduce((acc, data) => acc + data._model.circumference, 0);
-                                        const percentage = ((context.raw / total) * 100).toFixed(2) + '%';
-                                        label += ': ' + context.raw + ' (' + percentage + ')';
-                                    }
-                                    return label;
+                                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                    const percentage = ((context.raw / total) * 100).toFixed(2) + '%';
+                                    return `${context.label}: ${context.raw} (${percentage})`;
                                 }
                             }
                         },
                         datalabels: {
                             color: '#000',
                             formatter: function(value, context) {
-                                const total = context.chart._metasets[0].data.reduce((acc, data) => acc + data._model.circumference, 0);
+                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
                                 const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                return context.chart.data.labels[context.dataIndex] + ': ' + value + ' (' + percentage + ')';
+                                return `${context.chart.data.labels[context.dataIndex]}: ${value} (${percentage})`;
                             },
                             display: true
                         }
@@ -220,4 +202,7 @@
         }
 
         // CSVファイルを読み込み、データを処理
-        loadCSV('TIPS_members
+        loadCSV('TIPS_members.csv', processCSVData);
+    </script>
+</body>
+</html>
