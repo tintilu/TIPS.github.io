@@ -13,9 +13,10 @@
             width: 100%;
             overflow-x: auto; /* 横スクロールを許可 */
             overflow-y: hidden; /* 縦スクロールは非表示 */
+            padding: 10px 0; /* 上下に少し余白を追加 */
         }
         #myChart {
-            min-width: 600px; /* 最低幅を指定して、名前が潰れないようにする */
+            width: 2000px; /* キャンバスの幅を広げる */
         }
     </style>
 </head>
@@ -87,14 +88,14 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true
-                        },
                         x: {
                             ticks: {
                                 maxRotation: 90, // X軸ラベルの最大回転角度
                                 minRotation: 45  // X軸ラベルの最小回転角度
                             }
+                        },
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }
