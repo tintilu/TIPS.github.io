@@ -21,6 +21,7 @@
         function loadCSV(url, callback) {
             Papa.parse(url, {
                 download: true,
+                encoding: "UTF-8", // UTF-8で読み込む
                 complete: function(results) {
                     callback(results.data);
                 }
@@ -42,8 +43,15 @@
                 }
             }
 
+            // 参加回数が多い順に並べ替え
+            const combinedData = members.map((member, index) => ({ member, count: participationCounts[index] }));
+            combinedData.sort((a, b) => b.count - a.count); // 参加回数が多い順に並べ替え
+
+            const sortedMembers = combinedData.map(item => item.member);
+            const sortedCounts = combinedData.map(item => item.count);
+
             // グラフを描画
-            drawChart(members, participationCounts);
+            drawChart(sortedMembers, sortedCounts);
         }
 
         // グラフを描画する関数
