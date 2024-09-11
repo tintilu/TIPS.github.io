@@ -19,9 +19,18 @@
         canvas {
             display: inline-block; /* キャンバスをインラインブロックにする */
         }
+        /* 突貫工事中のスタイル */
+        .under-construction {
+            font-size: 3em; /* フォントサイズを大きく */
+            color: red; /* 色を赤に */
+            text-align: center; /* 中央揃え */
+            margin: 20px 0; /* 上下に余白を追加 */
+        }
     </style>
 </head>
 <body>
+    <div class="under-construction">突貫工事中</div> <!-- 突貫工事中の表示 -->
+
     <h1>サークル参加回数</h1>
     <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
     <div class="chart-container">
@@ -46,6 +55,7 @@
 
     <!-- PapaParseのCDNを読み込み（CSV解析用） -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     
     <!-- CSVを読み込んでグラフを描画するJavaScriptコード -->
     <script>
@@ -210,8 +220,8 @@
                     datasets: [{
                         label: 'レベルの分布',
                         data: Object.values(levelCounts),
-                        backgroundColor: ['rgba(255, 159, 64, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 205, 86, 0.2)'],
-                        borderColor: ['rgba(255, 159, 64, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 205, 86, 1)'],
+                        backgroundColor: ['rgba(255, 159, 64, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+                        borderColor: ['rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
                         borderWidth: 1
                     }]
                 },
@@ -306,6 +316,5 @@
         // CSVファイルを読み込み、データを処理
         loadCSV('TIPS_members.csv', processCSVData);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </body>
 </html>
