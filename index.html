@@ -6,8 +6,6 @@
     <title>サークル参加回数グラフ</title>
     <!-- Chart.jsのCDNを読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chart.js DataLabelsプラグインのCDNを読み込み -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <!-- スクロール用のスタイルを追加 -->
     <style>
         /* グラフをスクロール可能にするためのスタイル */
@@ -21,34 +19,29 @@
         canvas {
             display: inline-block; /* キャンバスをインラインブロックにする */
         }
-        /* グラフをスクロールしないようにする */
-        .chart-container-bar {
-            width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 10px 0;
-            white-space: nowrap;
-        }
-        /* 円グラフのサイズを調整 */
-        .chart-container-pie {
-            width: 300px; /* 円グラフの幅を設定 */
-            margin: 0 auto; /* センターに配置 */
-        }
     </style>
 </head>
 <body>
-    <h1>工事中</h1>
-
-    <h2>サークル参加回数</h2>
+    <h1>サークル参加回数</h1>
     <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
-    <div class="chart-container-bar">
+    <div class="chart-container">
         <canvas id="myChart"></canvas>
     </div>
 
-    <h2>全体の男女比</h2>
     <!-- 円グラフを表示するためのキャンバスを追加 -->
-    <div class="chart-container-pie">
+    <h2>全体の男女比</h2>
+    <div class="chart-container">
         <canvas id="genderChart"></canvas>
+    </div>
+
+    <h2>レベルの分布</h2>
+    <div class="chart-container">
+        <canvas id="levelChart"></canvas>
+    </div>
+
+    <h2>年代の分布</h2>
+    <div class="chart-container">
+        <canvas id="ageChart"></canvas>
     </div>
 
     <!-- PapaParseのCDNを読み込み（CSV解析用） -->
@@ -95,6 +88,12 @@
 
             // 男女比のグラフ用データ処理
             processGenderData(data);
+
+            // レベルのグラフ用データ処理
+            processLevelData(data);
+
+            // 年代のグラフ用データ処理
+            processAgeData(data);
         }
 
         // 男女比のデータを処理してグラフを描画する関数
@@ -116,12 +115,41 @@
             drawGenderChart(maleCount, femaleCount);
         }
 
+        // レベルのデータを処理してグラフを描画する関数
+        function processLevelData(data) {
+            const levelCounts = {};
+            
+            // レベルのカウント
+            for (let i = 3; i < data.length; i++) {
+                const level = data[i][7]; // H列からレベルを取得
+                if (level) {
+                    levelCounts[level] = (levelCounts[level] || 0) + 1;
+                }
+            }
+
+            // 円グラフを描画
+            drawLevelChart(levelCounts);
+        }
+
+        // 年代のデータを処理してグラフを描画する関数
+        function processAgeData(data) {
+            const ageCounts = {};
+            
+            // 年代のカウント
+            for (let i = 3; i < data.length; i++) {
+                const age = data[i][6]; // G列から年代を取得
+                if (age) {
+                    ageCounts[age] = (ageCounts[age] || 0) + 1;
+                }
+            }
+
+            // 円グラフを描画
+            drawAgeChart(ageCounts);
+        }
+
         // 男女比の円グラフを描画する関数
         function drawGenderChart(maleCount, femaleCount) {
             const ctx = document.getElementById('genderChart').getContext('2d');
-            const total = maleCount + femaleCount;
-            const malePercentage = ((maleCount / total) * 100).toFixed(2);
-            const femalePercentage = ((femaleCount / total) * 100).toFixed(2);
 
             new Chart(ctx, {
                 type: 'pie',
@@ -154,61 +182,121 @@
                         },
                         datalabels: {
                             display: true,
-                            formatter: (value, context) => {
-                                const percentage = (value / total * 100).toFixed(2);
-                                return `${context.chart.data.labels[context.dataIndex]}: ${value} (${percentage}%)`;
-                            },
                             color: '#000',
+                            formatter: (value, context) => {
+                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                const percentage = (value / total * 100).toFixed(2) + '%';
+                                return context.label + '\n' + value + ' (' + percentage + ')';
+                            },
+                            anchor: 'center',
+                            align: 'center',
                             font: {
                                 weight: 'bold'
-                            },
-                            anchor: 'center', // 円グラフ内に表示
-                            align: 'center'  // 円グラフ内に表示
+                            }
                         }
                     }
                 }
             });
         }
 
-        // 棒グラフを描画する関数
-        function drawChart(labels, data) {
-            const ctx = document.getElementById('myChart').getContext('2d');
-
-            // グラフの幅を動的に設定
-            const canvasWidth = Math.max(800, labels.length * 30); // ラベルの数に応じて幅を調整
-            document.getElementById('myChart').width = canvasWidth;
+        // レベルの円グラフを描画する関数
+        function drawLevelChart(levelCounts) {
+            const ctx = document.getElementById('levelChart').getContext('2d');
 
             new Chart(ctx, {
-                type: 'bar',
+                type: 'pie',
                 data: {
-                    labels: labels,
+                    labels: Object.keys(levelCounts),
                     datasets: [{
-                        label: '参加回数',
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        barThickness: 15, // 棒の厚さを少し小さく
-                        barPercentage: 0.8, // 棒の幅の割合を設定
-                        categoryPercentage: 0.9 // 棒の間隔を調整
+                        label: 'レベルの分布',
+                        data: Object.values(levelCounts),
+                        backgroundColor: ['rgba(255, 159, 64, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 205, 86, 0.2)'],
+                        borderColor: ['rgba(255, 159, 64, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 205, 86, 1)'],
+                        borderWidth: 1
                     }]
                 },
                 options: {
-                    responsive: false, // サイズ変更に反応しない
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            ticks: {
-                                maxRotation: 90, // X軸ラベルの最大回転角度
-                                minRotation: 45, // X軸ラベルの最小回転角度
-                                autoSkip: false // ラベルのスキップを無効にする
-                            },
-                            grid: {
-                                display: false // X軸のグリッドを非表示にする
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ' + context.raw;
+                                    }
+                                    return label;
+                                }
                             }
                         },
-                        y: {
-                            beginAtZero: true
+                        datalabels: {
+                            display: true,
+                            color: '#000',
+                            formatter: (value, context) => {
+                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                const percentage = (value / total * 100).toFixed(2) + '%';
+                                return context.label + '\n' + value + ' (' + percentage + ')';
+                            },
+                            anchor: 'center',
+                            align: 'center',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 年代の円グラフを描画する関数
+        function drawAgeChart(ageCounts) {
+            const ctx = document.getElementById('ageChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(ageCounts),
+                    datasets: [{
+                        label: '年代の分布',
+                        data: Object.values(ageCounts),
+                        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'],
+                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ' + context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#000',
+                            formatter: (value, context) => {
+                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                const percentage = (value / total * 100).toFixed(2) + '%';
+                                return context.label + '\n' + value + ' (' + percentage + ')';
+                            },
+                            anchor: 'center',
+                            align: 'center',
+                            font: {
+                                weight: 'bold'
+                            }
                         }
                     }
                 }
@@ -218,5 +306,6 @@
         // CSVファイルを読み込み、データを処理
         loadCSV('TIPS_members.csv', processCSVData);
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </body>
 </html>
