@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- PapaParseのCDNを読み込み（CSV解析用） -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- ChartDataLabelsプラグインのCDNを読み込み -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <!-- スクロール用のスタイルを追加 -->
     <style>
         /* グラフをスクロール可能にするためのスタイル */
@@ -26,6 +28,11 @@
             width: 300px; /* 円グラフの幅 */
             height: 300px; /* 円グラフの高さ */
         }
+        /* 棒グラフを横に大きくするためのスタイル */
+        .chart-container.large-bar-chart canvas {
+            width: 1500px; /* 棒グラフの幅 */
+            height: 400px; /* 棒グラフの高さ */
+        }
         /* 工事中のメッセージ用スタイル */
         .under-construction {
             text-align: center; /* テキストを中央揃え */
@@ -43,7 +50,7 @@
 
     <h1>サークル参加回数</h1>
     <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
-    <div class="chart-container">
+    <div class="chart-container large-bar-chart">
         <canvas id="myChart"></canvas>
     </div>
 
@@ -196,24 +203,9 @@
                                 }
                             }
                         },
-                        // 円グラフ内にタイトルと人数を表示
                         datalabels: {
                             color: '#000',
                             formatter: function(value, context) {
-                                return context.chart.data.labels[context.dataIndex] + ': ' + value;
-                            },
-                            display: true
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels] // ChartDataLabels プラグインを使用
-            });
-        }
-
-        // CSVファイルを読み込み、データを処理
-        loadCSV('TIPS_members.csv', processCSVData);
-    </script>
-    <!-- ChartDataLabelsプラグインのCDNを読み込み -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-</body>
-</html>
+                                const total = context.chart._metasets[0]._meta.data.reduce((acc, data) => acc + data._model.circumference, 0);
+                                const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                return context.chart.data.labels[context.dataIndex] + ': ' + value +
