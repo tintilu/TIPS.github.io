@@ -197,7 +197,9 @@
                                 label: function(context) {
                                     let label = context.label || '';
                                     if (label) {
-                                        label += ': ' + context.raw;
+                                        const total = context.chart._metasets[0].data.reduce((acc, data) => acc + data._model.circumference, 0);
+                                        const percentage = ((context.raw / total) * 100).toFixed(2) + '%';
+                                        label += ': ' + context.raw + ' (' + percentage + ')';
                                     }
                                     return label;
                                 }
@@ -206,6 +208,16 @@
                         datalabels: {
                             color: '#000',
                             formatter: function(value, context) {
-                                const total = context.chart._metasets[0]._meta.data.reduce((acc, data) => acc + data._model.circumference, 0);
+                                const total = context.chart._metasets[0].data.reduce((acc, data) => acc + data._model.circumference, 0);
                                 const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                return context.chart.data.labels[context.dataIndex] + ': ' + value +
+                                return context.chart.data.labels[context.dataIndex] + ': ' + value + ' (' + percentage + ')';
+                            },
+                            display: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // CSVファイルを読み込み、データを処理
+        loadCSV('TIPS_members
