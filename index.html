@@ -19,9 +19,21 @@
         canvas {
             display: inline-block; /* キャンバスをインラインブロックにする */
         }
+        /* 工事中のメッセージ用スタイル */
+        .under-construction {
+            text-align: center; /* テキストを中央揃え */
+            font-size: 3em; /* フォントサイズを大きく設定 */
+            color: red; /* テキストの色を赤に設定 */
+            margin: 20px 0; /* 上下にマージンを追加 */
+        }
     </style>
 </head>
 <body>
+    <!-- 工事中メッセージ -->
+    <div class="under-construction">
+        工事中
+    </div>
+
     <h1>サークル参加回数</h1>
     <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
     <div class="chart-container">
