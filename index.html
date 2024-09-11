@@ -6,6 +6,8 @@
     <title>サークル参加回数グラフ</title>
     <!-- Chart.jsのCDNを読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js DataLabelsプラグインのCDNを読み込み -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <!-- スクロール用のスタイルを追加 -->
     <style>
         /* グラフをスクロール可能にするためのスタイル */
@@ -51,8 +53,6 @@
 
     <!-- PapaParseのCDNを読み込み（CSV解析用） -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- Chart.js DataLabelsプラグインを読み込み -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
     <!-- CSVを読み込んでグラフを描画するJavaScriptコード -->
     <script>
@@ -161,7 +161,9 @@
                             color: '#000',
                             font: {
                                 weight: 'bold'
-                            }
+                            },
+                            anchor: 'center', // 円グラフ内に表示
+                            align: 'center'  // 円グラフ内に表示
                         }
                     }
                 }
@@ -215,6 +217,4 @@
 
         // CSVファイルを読み込み、データを処理
         loadCSV('TIPS_members.csv', processCSVData);
-    </script>
-</body>
-</html>
+    </
