@@ -14,9 +14,10 @@
             overflow-x: auto; /* 横スクロールを許可 */
             overflow-y: hidden; /* 縦スクロールは非表示 */
             padding: 10px 0; /* 上下に少し余白を追加 */
+            white-space: nowrap; /* コンテンツを横に並べる */
         }
-        #myChart {
-            width: 2000px; /* キャンバスの幅を広げる。必要に応じて調整 */
+        canvas {
+            display: inline-block; /* キャンバスをインラインブロックにする */
         }
     </style>
 </head>
@@ -72,7 +73,12 @@
         // グラフを描画する関数
         function drawChart(labels, data) {
             const ctx = document.getElementById('myChart').getContext('2d');
-            const myChart = new Chart(ctx, {
+
+            // グラフの幅を動的に設定
+            const canvasWidth = Math.max(800, labels.length * 30); // ラベルの数に応じて幅を調整
+            document.getElementById('myChart').width = canvasWidth;
+
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -88,7 +94,7 @@
                     }]
                 },
                 options: {
-                    responsive: true,
+                    responsive: false, // サイズ変更に反応しない
                     maintainAspectRatio: false,
                     scales: {
                         x: {
