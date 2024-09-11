@@ -16,7 +16,7 @@
             padding: 10px 0; /* 上下に少し余白を追加 */
         }
         #myChart {
-            width: 2000px; /* キャンバスの幅を広げる */
+            width: 10000px; /* キャンバスの幅を広げる。必要に応じて調整 */
         }
     </style>
 </head>
@@ -91,7 +91,11 @@
                         x: {
                             ticks: {
                                 maxRotation: 90, // X軸ラベルの最大回転角度
-                                minRotation: 45  // X軸ラベルの最小回転角度
+                                minRotation: 45, // X軸ラベルの最小回転角度
+                                autoSkip: false // ラベルのスキップを無効にする
+                            },
+                            grid: {
+                                display: false // X軸のグリッドを非表示にする
                             }
                         },
                         y: {
