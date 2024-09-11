@@ -6,11 +6,25 @@
     <title>サークル参加回数グラフ</title>
     <!-- Chart.jsのCDNを読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- スクロール用のスタイルを追加 -->
+    <style>
+        /* グラフをスクロール可能にするためのスタイル */
+        .chart-container {
+            width: 100%;
+            overflow-x: auto; /* 横スクロールを許可 */
+            overflow-y: hidden; /* 縦スクロールは非表示 */
+        }
+        #myChart {
+            min-width: 600px; /* 最低幅を指定して、名前が潰れないようにする */
+        }
+    </style>
 </head>
 <body>
     <h1>サークル参加回数</h1>
-    <!-- グラフを表示するためのキャンバス -->
-    <canvas id="myChart" width="400" height="400"></canvas>
+    <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
+    <div class="chart-container">
+        <canvas id="myChart"></canvas>
+    </div>
 
     <!-- PapaParseのCDNを読み込み（CSV解析用） -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -70,9 +84,17 @@
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 90, // X軸ラベルの最大回転角度
+                                minRotation: 45  // X軸ラベルの最小回転角度
+                            }
                         }
                     }
                 }
