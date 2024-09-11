@@ -11,11 +11,12 @@
         /* グラフをスクロール可能にするためのスタイル */
         .chart-container {
             width: 100%;
-            overflow-y: auto; /* 縦スクロールは非表示 */
+            overflow-x: auto; /* 横スクロールを許可 */
+            overflow-y: hidden; /* 縦スクロールは非表示 */
             padding: 10px 0; /* 上下に少し余白を追加 */
         }
         #myChart {
-            width: 800px; /* キャンバスの幅を広げる。必要に応じて調整 */
+            width: 2000px; /* キャンバスの幅を広げる。必要に応じて調整 */
         }
     </style>
 </head>
@@ -80,7 +81,10 @@
                         data: data,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        barThickness: 20, // 棒の厚さを設定
+                        barPercentage: 0.8, // 棒の幅の割合を設定
+                        categoryPercentage: 0.9 // 棒の間隔を調整
                     }]
                 },
                 options: {
