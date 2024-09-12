@@ -132,53 +132,55 @@
 
         // 男女比のデータを処理してグラフを描画する関数
     function drawGenderChart(maleCount, femaleCount) {
-        const ctx = document.getElementById('genderChart').getContext('2d');
-        const total = maleCount + femaleCount;
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['男性', '女性'],
-                datasets: [{
-                    label: '男女比',
-                    data: [maleCount, femaleCount],
-                    backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ' + context.raw;
-                                }
-                                return label;
+    const ctx = document.getElementById('genderChart').getContext('2d');
+    const total = maleCount + femaleCount;
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['男性', '女性'],
+            datasets: [{
+                label: '男女比',
+                data: [maleCount, femaleCount],
+                backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ' + context.raw;
                             }
-                        }
-                    },
-                    datalabels: {
-                        display: true,
-                        formatter: (value, context) => {
-                            const percentage = (value / total * 100).toFixed(2);
-                            return `${value} (${percentage}%)`; // 数字とパーセンテージを表示
-                        },
-                        color: '#000', // テキストの色
-                        font: {
-                            weight: 'bold', // フォントの太さ
-                            size: 14 // フォントサイズ
+                            return label;
                         }
                     }
+                },
+                datalabels: {
+                    display: true, // データラベルを常に表示
+                    formatter: (value, context) => {
+                        const percentage = (value / total * 100).toFixed(2);
+                        return `${value} (${percentage}%)`; // 数字とパーセンテージを表示
+                    },
+                    color: '#000', // テキストの色
+                    font: {
+                        weight: 'bold', // フォントの太さ
+                        size: 14 // フォントサイズ
+                    },
+                    anchor: 'center', // 円の中心に配置
+                    align: 'center' // 円の中心に配置
                 }
             }
-        });
-    }
+        }
+    });
+}
 
         // レベルのデータを処理してグラフを描画する関数
         function processLevelData(data) {
