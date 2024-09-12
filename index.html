@@ -130,8 +130,8 @@
             drawGenderChart(maleCount, femaleCount);
         }
 
-        // 男女比のデータを処理してグラフを描画する関数
-    function drawGenderChart(maleCount, femaleCount) {
+       // 男女比のデータを処理してグラフを描画する関数
+function drawGenderChart(maleCount, femaleCount) {
     const ctx = document.getElementById('genderChart').getContext('2d');
     const total = maleCount + femaleCount;
     new Chart(ctx, {
@@ -164,7 +164,7 @@
                     }
                 },
                 datalabels: {
-                    display: true, // データラベルを常に表示
+                    display: true,
                     formatter: (value, context) => {
                         const percentage = (value / total * 100).toFixed(2);
                         return `${value} (${percentage}%)`; // 数字とパーセンテージを表示
@@ -174,8 +174,8 @@
                         weight: 'bold', // フォントの太さ
                         size: 14 // フォントサイズ
                     },
-                    anchor: 'center', // 円の中心に配置
-                    align: 'center' // 円の中心に配置
+                    anchor: 'end', // ラベルのアンカー位置
+                    align: 'end', // ラベルの整列位置
                 }
             }
         }
