@@ -37,23 +37,23 @@
         <canvas id="myChart"></canvas>
     </div>
 
-    <!-- 円グラフを表示するためのキャンバスを追加 -->
+    <!-- 他のグラフをコメントアウト -->
+    <!-- 
     <h2>全体の男女比</h2>
     <div class="chart-container">
         <canvas id="genderChart"></canvas>
     </div>
 
-    <!-- レベルの円グラフを追加 -->
     <h2>レベルの分布</h2>
     <div class="chart-container">
         <canvas id="levelChart"></canvas>
     </div>
 
-    <!-- 年代の円グラフを追加 -->
     <h2>年代の分布</h2>
     <div class="chart-container">
         <canvas id="ageChart"></canvas>
     </div>
+    -->
 
     <!-- PapaParseのCDNを読み込み（CSV解析用） -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -97,72 +97,16 @@
             // グラフを描画
             drawChart(sortedMembers, sortedCounts);
 
-            // 男女比のグラフ用データ処理
+            // 他のグラフ用のデータ処理をコメントアウト
+            /*
             processGenderData(data);
-            // レベルの円グラフ用データ処理
             processLevelData(data);
-            // 年代の円グラフ用データ処理
             processAgeData(data);
+            */
         }
 
-        // 男女比のデータを処理してグラフを描画する関数
-        function processGenderData(data) {
-            let maleCount = 0;
-            let femaleCount = 0;
-
-            // 男女のカウント
-            for (let i = 3; i < data.length; i++) {
-                const gender = data[i][4]; // E列から性別を取得
-                if (gender === '男性') {
-                    maleCount++;
-                } else if (gender === '女性') {
-                    femaleCount++;
-                }
-            }
-
-            // 円グラフを描画
-            drawPieChart('genderChart', ['男性', '女性'], [maleCount, femaleCount], '男女比');
-        }
-
-        // レベルのデータを処理してグラフを描画する関数
-        function processLevelData(data) {
-            const levels = {};
-            for (let i = 3; i < data.length; i++) {
-                const level = data[i][7]; // H列からレベルを取得
-                if (levels[level]) {
-                    levels[level]++;
-                } else {
-                    levels[level] = 1;
-                }
-            }
-
-            const levelLabels = Object.keys(levels);
-            const levelCounts = Object.values(levels);
-
-            // 円グラフを描画
-            drawPieChart('levelChart', levelLabels, levelCounts, 'レベル分布');
-        }
-
-        // 年代のデータを処理してグラフを描画する関数
-        function processAgeData(data) {
-            const ages = {};
-            for (let i = 3; i < data.length; i++) {
-                const age = data[i][6]; // G列から年代を取得
-                if (ages[age]) {
-                    ages[age]++;
-                } else {
-                    ages[age] = 1;
-                }
-            }
-
-            const ageLabels = Object.keys(ages);
-            const ageCounts = Object.values(ages);
-
-            // 円グラフを描画
-            drawPieChart('ageChart', ageLabels, ageCounts, '年代分布');
-        }
-
-        // 円グラフを描画する関数（データラベルを追加）
+        // 円グラフを描画する関数（データラベルを追加）をコメントアウト
+        /*
         function drawPieChart(chartId, labels, data, title) {
             const ctx = document.getElementById(chartId).getContext('2d');
 
@@ -197,6 +141,7 @@
                 }
             });
         }
+        */
 
         // 棒グラフを描画する関数
         function drawChart(labels, data) {
@@ -232,6 +177,7 @@
                 }
             });
         }
+
         // CSVファイルを読み込む
         loadCSV('your-data.csv', processCSVData); // 'your-data.csv'を実際のCSVファイルのURLに置き換えてください
     </script>
