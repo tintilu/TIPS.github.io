@@ -6,12 +6,9 @@
     <title>サークル参加回数グラフ</title>
     <!-- Chart.jsのCDNを読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParseのCDNを読み込み（CSV解析用） -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- ChartDataLabelsプラグインのCDNを読み込み -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <!-- スクロール用のスタイルを追加 -->
     <style>
+        /* グラフをスクロール可能にするためのスタイル */
         .chart-container {
             width: 100%;
             overflow-x: auto; /* 横スクロールを許可 */
@@ -22,58 +19,55 @@
         canvas {
             display: inline-block; /* キャンバスをインラインブロックにする */
         }
-        .chart-container.small-chart canvas {
-            width: 300px; /* 円グラフの幅 */
-            height: 300px; /* 円グラフの高さ */
+        /* グラフをスクロールしないようにする */
+        .chart-container-bar {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0;
+            white-space: nowrap;
         }
-        .chart-container.large-bar-chart canvas {
-            width: 1500px; /* 棒グラフの幅 */
-            height: 400px; /* 棒グラフの高さ */
-        }
-        .under-construction {
-            text-align: center; /* テキストを中央揃え */
-            font-size: 3em; /* フォントサイズを大きく設定 */
-            color: red; /* テキストの色を赤に設定 */
-            margin: 20px 0; /* 上下にマージンを追加 */
+        /* 円グラフのサイズを調整 */
+        .chart-container-pie {
+            width: 300px; /* 円グラフの幅を設定 */
+            margin: 0 auto; /* センターに配置 */
         }
     </style>
 </head>
 <body>
-    <div class="under-construction">
-        工事中
-    </div>
+    <h1>工事中</h1>
 
-    <h1>サークル参加回数</h1>
-    <div class="chart-container large-bar-chart">
+    <h2>サークル参加回数</h2>
+    <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
+    <div class="chart-container-bar">
         <canvas id="myChart"></canvas>
     </div>
 
     <h2>全体の男女比</h2>
-    <div class="chart-container small-chart">
+    <!-- 円グラフを表示するためのキャンバスを追加 -->
+    <div class="chart-container-pie">
         <canvas id="genderChart"></canvas>
     </div>
 
+    <!-- PapaParseのCDNを読み込み（CSV解析用） -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    
+    <!-- CSVを読み込んでグラフを描画するJavaScriptコード -->
     <script>
         // CSVファイルを読み込む関数
         function loadCSV(url, callback) {
             Papa.parse(url, {
                 download: true,
-                encoding: "UTF-8",
+                encoding: "UTF-8", // UTF-8で読み込む
                 complete: function(results) {
-                    if (results.data && results.data.length > 0) {
-                        callback(results.data);
-                    } else {
-                        console.error("CSV データが空です。");
-                    }
-                },
-                error: function(error) {
-                    console.error("CSV 読み込みエラー:", error);
+                    callback(results.data);
                 }
             });
         }
 
         // CSVのデータを処理してグラフを描画する関数
         function processCSVData(data) {
+            // 参加回数のグラフ用データ処理
             const members = data.slice(3, 39).map(row => row[11]); // L列からメンバー名を取得（4〜39行）
             const participationCounts = members.map(() => 0); // 参加回数の配列を初期化
 
@@ -106,6 +100,7 @@
             let maleCount = 0;
             let femaleCount = 0;
 
+            // 男女のカウント
             for (let i = 3; i < data.length; i++) {
                 const gender = data[i][4]; // E列から性別を取得
                 if (gender === '男性') {
@@ -115,50 +110,16 @@
                 }
             }
 
+            // 円グラフを描画
             drawGenderChart(maleCount, femaleCount);
-        }
-
-        // 参加回数の棒グラフを描画する関数
-        function drawChart(labels, data) {
-            const ctx = document.getElementById('myChart').getContext('2d');
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '参加回数',
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            ticks: {
-                                maxRotation: 90,
-                                minRotation: 45,
-                                autoSkip: false
-                            },
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
         }
 
         // 男女比の円グラフを描画する関数
         function drawGenderChart(maleCount, femaleCount) {
             const ctx = document.getElementById('genderChart').getContext('2d');
+            const total = maleCount + femaleCount;
+            const malePercentage = ((maleCount / total) * 100).toFixed(2);
+            const femalePercentage = ((femaleCount / total) * 100).toFixed(2);
 
             new Chart(ctx, {
                 type: 'pie',
@@ -181,20 +142,66 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-                                    const percentage = ((context.raw / total) * 100).toFixed(2) + '%';
-                                    return `${context.label}: ${context.raw} (${percentage})`;
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ' + context.raw;
+                                    }
+                                    return label;
                                 }
                             }
                         },
                         datalabels: {
-                            color: '#000',
-                            formatter: function(value, context) {
-                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-                                const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                return `${context.chart.data.labels[context.dataIndex]}: ${value} (${percentage})`;
+                            display: true,
+                            formatter: (value, context) => {
+                                const percentage = (value / total * 100).toFixed(2);
+                                return `${value} (${percentage}%)`;
                             },
-                            display: true
+                            color: '#000'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 棒グラフを描画する関数
+        function drawChart(labels, data) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+
+            // グラフの幅を動的に設定
+            const canvasWidth = Math.max(800, labels.length * 30); // ラベルの数に応じて幅を調整
+            document.getElementById('myChart').width = canvasWidth;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '参加回数',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        barThickness: 15, // 棒の厚さを少し小さく
+                        barPercentage: 0.8, // 棒の幅の割合を設定
+                        categoryPercentage: 0.9 // 棒の間隔を調整
+                    }]
+                },
+                options: {
+                    responsive: false, // サイズ変更に反応しない
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 90, // X軸ラベルの最大回転角度
+                                minRotation: 45, // X軸ラベルの最小回転角度
+                                autoSkip: false // ラベルのスキップを無効にする
+                            },
+                            grid: {
+                                display: false // X軸のグリッドを非表示にする
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }
