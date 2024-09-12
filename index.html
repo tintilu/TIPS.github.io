@@ -79,11 +79,11 @@
         // CSVのデータを処理してグラフを描画する関数
         function processCSVData(data) {
             // 参加回数のグラフ用データ処理
-            const members = data.slice(3, 40).map(row => row[11]); // L列からメンバー名を取得（4〜39行）
+            const members = data.slice(3, 39).map(row => row[11]); // L列からメンバー名を取得（4〜39行）
             const participationCounts = members.map(() => 0); // 参加回数の配列を初期化
 
             // 参加回数を計算
-            for (let i = 3; i < 40; i++) {
+            for (let i = 3; i < 39; i++) {
                 const row = data[i];
                 for (let j = 12; j <= 45; j++) { // M列からAT列の範囲（インデックス12から45）
                     if (row[j] === '1') {
