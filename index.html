@@ -6,11 +6,12 @@
     <title>サークル参加回数グラフ</title>
     <!-- Chart.jsのCDNを読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- chartjs-plugin-datalabelsのCDNを読み込み -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- PapaParseのCDNを読み込み（CSV解析用） -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- ChartDataLabelsプラグインのCDNを読み込み -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <!-- スクロール用のスタイルを追加 -->
     <style>
-        /* グラフをスクロール可能にするためのスタイル */
         .chart-container {
             width: 100%;
             overflow-x: auto; /* 横スクロールを許可 */
@@ -20,60 +21,59 @@
         }
         canvas {
             display: inline-block; /* キャンバスをインラインブロックにする */
-            max-height: 400px; /* 最大高さを設定 */
         }
-        h1 {
-            font-size: 36px;
-            color: red;
-            text-align: center;
+        .chart-container.small-chart canvas {
+            width: 300px; /* 円グラフの幅 */
+            height: 300px; /* 円グラフの高さ */
+        }
+        .chart-container.large-bar-chart canvas {
+            width: 1500px; /* 棒グラフの幅 */
+            height: 400px; /* 棒グラフの高さ */
+        }
+        .under-construction {
+            text-align: center; /* テキストを中央揃え */
+            font-size: 3em; /* フォントサイズを大きく設定 */
+            color: red; /* テキストの色を赤に設定 */
+            margin: 20px 0; /* 上下にマージンを追加 */
         }
     </style>
 </head>
 <body>
-    <h1>突貫工事中</h1>
-    <h2>サークル参加回数</h2>
-    <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
-    <div class="chart-container">
+    <div class="under-construction">
+        工事中
+    </div>
+
+    <h1>サークル参加回数</h1>
+    <div class="chart-container large-bar-chart">
         <canvas id="myChart"></canvas>
     </div>
 
-    <!-- 他のグラフをコメントアウト -->
-    <!-- 
     <h2>全体の男女比</h2>
-    <div class="chart-container">
+    <div class="chart-container small-chart">
         <canvas id="genderChart"></canvas>
     </div>
 
-    <h2>レベルの分布</h2>
-    <div class="chart-container">
-        <canvas id="levelChart"></canvas>
-    </div>
-
-    <h2>年代の分布</h2>
-    <div class="chart-container">
-        <canvas id="ageChart"></canvas>
-    </div>
-    -->
-
-    <!-- PapaParseのCDNを読み込み（CSV解析用） -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    
-    <!-- CSVを読み込んでグラフを描画するJavaScriptコード -->
     <script>
         // CSVファイルを読み込む関数
         function loadCSV(url, callback) {
             Papa.parse(url, {
                 download: true,
-                encoding: "UTF-8", // UTF-8で読み込む
+                encoding: "UTF-8",
                 complete: function(results) {
-                    callback(results.data);
+                    if (results.data && results.data.length > 0) {
+                        callback(results.data);
+                    } else {
+                        console.error("CSV データが空です。");
+                    }
+                },
+                error: function(error) {
+                    console.error("CSV 読み込みエラー:", error);
                 }
             });
         }
 
         // CSVのデータを処理してグラフを描画する関数
         function processCSVData(data) {
-            // 参加回数のグラフ用データ処理
             const members = data.slice(3, 39).map(row => row[11]); // L列からメンバー名を取得（4〜39行）
             const participationCounts = members.map(() => 0); // 参加回数の配列を初期化
 
@@ -97,53 +97,28 @@
             // グラフを描画
             drawChart(sortedMembers, sortedCounts);
 
-            // 他のグラフ用のデータ処理をコメントアウト
-            /*
+            // 男女比のグラフ用データ処理
             processGenderData(data);
-            processLevelData(data);
-            processAgeData(data);
-            */
         }
 
-        // 円グラフを描画する関数（データラベルを追加）をコメントアウト
-        /*
-        function drawPieChart(chartId, labels, data, title) {
-            const ctx = document.getElementById(chartId).getContext('2d');
+        // 男女比のデータを処理してグラフを描画する関数
+        function processGenderData(data) {
+            let maleCount = 0;
+            let femaleCount = 0;
 
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 99, 132, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)'],
-                        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        datalabels: {
-                            formatter: (value, context) => {
-                                const percentage = ((value / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
-                                return `${context.chart.data.labels[context.dataIndex]}: ${value} (${percentage}%)`;
-                            },
-                            color: '#000',
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    }
+            for (let i = 3; i < data.length; i++) {
+                const gender = data[i][4]; // E列から性別を取得
+                if (gender === '男性') {
+                    maleCount++;
+                } else if (gender === '女性') {
+                    femaleCount++;
                 }
-            });
-        }
-        */
+            }
 
-        // 棒グラフを描画する関数
+            drawGenderChart(maleCount, femaleCount);
+        }
+
+        // 参加回数の棒グラフを描画する関数
         function drawChart(labels, data) {
             const ctx = document.getElementById('myChart').getContext('2d');
 
@@ -154,32 +129,80 @@
                     datasets: [{
                         label: '参加回数',
                         data: data,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }]
                 },
                 options: {
-                    responsive: true,
+                    responsive: false,
+                    maintainAspectRatio: false,
                     scales: {
                         x: {
-                            beginAtZero: true
+                            ticks: {
+                                maxRotation: 90,
+                                minRotation: 45,
+                                autoSkip: false
+                            },
+                            grid: {
+                                display: false
+                            }
                         },
                         y: {
                             beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
                         }
                     }
                 }
             });
         }
 
-        // CSVファイルを読み込む
-        loadCSV('your-data.csv', processCSVData); // 'your-data.csv'を実際のCSVファイルのURLに置き換えてください
+        // 男女比の円グラフを描画する関数
+        function drawGenderChart(maleCount, femaleCount) {
+            const ctx = document.getElementById('genderChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['男性', '女性'],
+                    datasets: [{
+                        label: '男女比',
+                        data: [maleCount, femaleCount],
+                        backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                    const percentage = ((context.raw / total) * 100).toFixed(2) + '%';
+                                    return `${context.label}: ${context.raw} (${percentage})`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#000',
+                            formatter: function(value, context) {
+                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                return `${context.chart.data.labels[context.dataIndex]}: ${value} (${percentage})`;
+                            },
+                            display: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // CSVファイルを読み込み、データを処理
+        loadCSV('TIPS_members.csv', processCSVData);
     </script>
 </body>
 </html>
