@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>サークル参加回数グラフ</title>
-    <!-- Chart.jsとchartjs-plugin-datalabelsのCDNを読み込み -->
+    <!-- Chart.jsのCDNを読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- chartjs-plugin-datalabelsのCDNを読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <!-- スクロール用のスタイルを追加 -->
     <style>
@@ -19,20 +20,18 @@
         }
         canvas {
             display: inline-block; /* キャンバスをインラインブロックにする */
+            max-height: 400px; /* 最大高さを設定 */
         }
-        /* 突貫工事中のスタイル */
-        .under-construction {
-            font-size: 3em; /* フォントサイズを大きく */
-            color: red; /* 色を赤に */
-            text-align: center; /* 中央揃え */
-            margin: 20px 0; /* 上下に余白を追加 */
+        h1 {
+            font-size: 36px;
+            color: red;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="under-construction">突貫工事中</div> <!-- 突貫工事中の表示 -->
-
-    <h1>サークル参加回数</h1>
+    <h1>突貫工事中</h1>
+    <h2>サークル参加回数</h2>
     <!-- グラフを表示するためのキャンバスをスクロール可能なコンテナでラップ -->
     <div class="chart-container">
         <canvas id="myChart"></canvas>
@@ -44,11 +43,13 @@
         <canvas id="genderChart"></canvas>
     </div>
 
+    <!-- レベルの円グラフを追加 -->
     <h2>レベルの分布</h2>
     <div class="chart-container">
         <canvas id="levelChart"></canvas>
     </div>
 
+    <!-- 年代の円グラフを追加 -->
     <h2>年代の分布</h2>
     <div class="chart-container">
         <canvas id="ageChart"></canvas>
@@ -98,11 +99,9 @@
 
             // 男女比のグラフ用データ処理
             processGenderData(data);
-
-            // レベルのグラフ用データ処理
+            // レベルの円グラフ用データ処理
             processLevelData(data);
-
-            // 年代のグラフ用データ処理
+            // 年代の円グラフ用データ処理
             processAgeData(data);
         }
 
@@ -122,54 +121,59 @@
             }
 
             // 円グラフを描画
-            drawGenderChart(maleCount, femaleCount);
+            drawPieChart('genderChart', ['男性', '女性'], [maleCount, femaleCount], '男女比');
         }
 
         // レベルのデータを処理してグラフを描画する関数
         function processLevelData(data) {
-            const levelCounts = {};
-            
-            // レベルのカウント
+            const levels = {};
             for (let i = 3; i < data.length; i++) {
                 const level = data[i][7]; // H列からレベルを取得
-                if (level) {
-                    levelCounts[level] = (levelCounts[level] || 0) + 1;
+                if (levels[level]) {
+                    levels[level]++;
+                } else {
+                    levels[level] = 1;
                 }
             }
 
+            const levelLabels = Object.keys(levels);
+            const levelCounts = Object.values(levels);
+
             // 円グラフを描画
-            drawLevelChart(levelCounts);
+            drawPieChart('levelChart', levelLabels, levelCounts, 'レベル分布');
         }
 
         // 年代のデータを処理してグラフを描画する関数
         function processAgeData(data) {
-            const ageCounts = {};
-            
-            // 年代のカウント
+            const ages = {};
             for (let i = 3; i < data.length; i++) {
                 const age = data[i][6]; // G列から年代を取得
-                if (age) {
-                    ageCounts[age] = (ageCounts[age] || 0) + 1;
+                if (ages[age]) {
+                    ages[age]++;
+                } else {
+                    ages[age] = 1;
                 }
             }
 
+            const ageLabels = Object.keys(ages);
+            const ageCounts = Object.values(ages);
+
             // 円グラフを描画
-            drawAgeChart(ageCounts);
+            drawPieChart('ageChart', ageLabels, ageCounts, '年代分布');
         }
 
-        // 男女比の円グラフを描画する関数
-        function drawGenderChart(maleCount, femaleCount) {
-            const ctx = document.getElementById('genderChart').getContext('2d');
+        // 円グラフを描画する関数（データラベルを追加）
+        function drawPieChart(chartId, labels, data, title) {
+            const ctx = document.getElementById(chartId).getContext('2d');
 
             new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['男性', '女性'],
+                    labels: labels,
                     datasets: [{
-                        label: '男女比',
-                        data: [maleCount, femaleCount],
-                        backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-                        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                        data: data,
+                        backgroundColor: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 99, 132, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)'],
+                        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)'],
                         borderWidth: 1
                     }]
                 },
@@ -180,15 +184,11 @@
                             position: 'top'
                         },
                         datalabels: {
-                            display: true,
-                            color: '#000',
                             formatter: (value, context) => {
-                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-                                const percentage = (value / total * 100).toFixed(2) + '%';
-                                return context.label + '\n' + value + ' (' + percentage + ')';
+                                const percentage = ((value / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                                return `${context.chart.data.labels[context.dataIndex]}: ${value} (${percentage}%)`;
                             },
-                            anchor: 'center',
-                            align: 'center',
+                            color: '#000',
                             font: {
                                 weight: 'bold'
                             }
@@ -198,90 +198,43 @@
             });
         }
 
-        // レベルの円グラフを描画する関数
-        function drawLevelChart(levelCounts) {
-            const ctx = document.getElementById('levelChart').getContext('2d');
+        // 棒グラフを描画する関数
+        function drawChart(labels, data) {
+            const ctx = document.getElementById('myChart').getContext('2d');
 
             new Chart(ctx, {
-                type: 'pie',
+                type: 'bar',
                 data: {
-                    labels: Object.keys(levelCounts),
+                    labels: labels,
                     datasets: [{
-                        label: 'レベルの分布',
-                        data: Object.values(levelCounts),
-                        backgroundColor: ['rgba(255, 159, 64, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
-                        borderColor: ['rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                        label: '参加回数',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
                     plugins: {
                         legend: {
-                            position: 'top'
-                        },
-                        datalabels: {
-                            display: true,
-                            color: '#000',
-                            formatter: (value, context) => {
-                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-                                const percentage = (value / total * 100).toFixed(2) + '%';
-                                return context.label + '\n' + value + ' (' + percentage + ')';
-                            },
-                            anchor: 'center',
-                            align: 'center',
-                            font: {
-                                weight: 'bold'
-                            }
+                            display: false
                         }
                     }
                 }
             });
         }
 
-        // 年代の円グラフを描画する関数
-        function drawAgeChart(ageCounts) {
-            const ctx = document.getElementById('ageChart').getContext('2d');
-
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(ageCounts),
-                    datasets: [{
-                        label: '年代の分布',
-                        data: Object.values(ageCounts),
-                        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'],
-                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        datalabels: {
-                            display: true,
-                            color: '#000',
-                            formatter: (value, context) => {
-                                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
-                                const percentage = (value / total * 100).toFixed(2) + '%';
-                                return context.label + '\n' + value + ' (' + percentage + ')';
-                            },
-                            anchor: 'center',
-                            align: 'center',
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // CSVファイルを読み込み、データを処理
-        loadCSV('TIPS_members.csv', processCSVData);
+        // CSVファイルを読み込む
+        loadCSV('your-data.csv', processCSVData); // 'your-data.csv'を実際のCSVファイルのURLに置き換えてください
     </script>
 </body>
 </html>
