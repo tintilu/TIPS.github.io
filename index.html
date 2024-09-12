@@ -60,6 +60,8 @@
         <canvas id="ageChart"></canvas>
     </div>
 
+    <h2>----以下工事中----</h2>
+
     <!-- PapaParseのCDNを読み込み（CSV解析用） -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     
@@ -221,7 +223,7 @@
         function drawPieChart(chartId, labels, data, chartLabel) {
             const ctx = document.getElementById(chartId).getContext('2d');
             new Chart(ctx, {
-                type: 'polarArea',
+                type: 'pie',
                 data: {
                     labels: labels,
                     datasets: [{
