@@ -221,23 +221,8 @@
         function drawPieChart(chartId, labels, data, chartLabel) {
             const ctx = document.getElementById(chartId).getContext('2d');
             const config = {
-  type: 'polarArea',
-  data: data,
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'Chart.js Polar Area Chart'
-      }
-    }
-  },
-};
             new Chart(ctx, {
-                type: 'pie',
+                type: 'polarArea',
                 data: {
                     labels: labels,
                     datasets: [{
