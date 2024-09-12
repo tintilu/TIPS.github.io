@@ -169,7 +169,7 @@
                             display: true,
                             formatter: (value, context) => {
                                 const percentage = (value / total * 100).toFixed(2);
-                                return `${value} (${percentage}%)`;
+                                return `${value}`;
                             },
                             color:"#333", 
           　　　　　　　　　　　 font: { // フォント設定
@@ -262,7 +262,7 @@
                             display: true,
                             formatter: (value, context) => {
                                 const percentage = (value / data.reduce((a, b) => a + b, 0) * 100).toFixed(2);
-                                return `${value} (${percentage}%)`;
+                                return `context:${value}`;
                             },
                             color:"#333", 
           　　　　　　　　　　　 font: { // フォント設定
