@@ -149,6 +149,13 @@
                 },
                 plugins: [ChartDataLabels],
                 options: {
+                    plugins: {
+        　　　　　　　 datalabels: { // パーセンテージからラベル表記に変更
+         　　　　　　　　  formatter: function(value, context) { 
+           　　　　　　　  return context.chart.data.labels[context.dataIndex];
+          　　　　　　　 }
+         　　　　　　}
+      　　　　　　 }
                     responsive: true,
                     plugins: {
                         legend: {
